@@ -26,7 +26,7 @@ chromadb>=0.4.24
 sentence-transformers>=2.7.0
 langchain==0.1.8
 langchain-google-genai>=0.0.9
-google-generativeai>=0.4.1
+google-generativeai>=0.8.6
 langchain-openai==0.0.5
 langchain-anthropic==0.1.4
 openai==1.12.0
