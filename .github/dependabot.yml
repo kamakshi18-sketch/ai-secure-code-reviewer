@@ -1,0 +1,87 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps(backend):"
+    groups:
+      security-tools:
+        patterns:
+          - "semgrep"
+          - "bandit"
+          - "gitleaks"
+          - "trivy"
+      ai-ml:
+        patterns:
+          - "langchain*"
+          - "openai"
+          - "anthropic"
+          - "sentence-transformers"
+      web-framework:
+        patterns:
+          - "fastapi"
+          - "uvicorn"
+          - "pydantic*"
+      database:
+        patterns:
+          - "sqlalchemy"
+          - "asyncpg"
+          - "alembic"
+      testing:
+        patterns:
+          - "pytest*"
+          - "httpx"
+  
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "frontend"
+    commit-message:
+      prefix: "deps(frontend):"
+    groups:
+      react-ecosystem:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      ui-libraries:
+        patterns:
+          - "lucide-react"
+          - "framer-motion"
+          - "recharts"
+          - "@monaco-editor*"
+      build-tools:
+        patterns:
+          - "vite"
+          - "typescript"
+          - "eslint*"
+          - "prettier*"
+      testing:
+        patterns:
+          - "vitest"
+          - "@testing-library*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "deps(actions):"

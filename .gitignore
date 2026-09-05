@@ -1,0 +1,153 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.dmypy.json
+dmypy.json
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.*
+!.env.example
+*.local
+
+# =========================
+# IDEs & Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Node / React
+# =========================
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+coverage/
+frontend/dist/
+
+# Vite
+.vite/
+frontend/.vite/
+
+# =========================
+# Docker
+# =========================
+docker-data/
+.docker/
+*.pid
+
+# =========================
+# Database & Volumes
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# PostgreSQL / Redis / Vector DB volumes
+postgres_data/
+redis_data/
+chromadb_data/
+
+# =========================
+# AI Models / Embeddings
+# =========================
+/models/
+!backend/models/
+embeddings/
+vectorstore/
+chroma/
+*.bin
+*.pt
+*.pth
+
+# HuggingFace cache
+.cache/
+.huggingface/
+transformers_cache/
+
+# =========================
+# Temporary files
+# =========================
+tmp/
+temp/
+*.tmp
+
+# =========================
+# Celery
+# =========================
+celerybeat-schedule
+celerybeat.pid
+
+# =========================
+# Monitoring
+# =========================
+prometheus_data/
+grafana_data/
+
+# =========================
+# Reports
+# (keep if generated automatically)
+# =========================
+reports/generated/
+exports/
+
+# =========================
+# Test artifacts
+# =========================
+playwright-report/
+test-results/
+
+# =========================
+# Security / Secrets
+# =========================
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+credentials/
