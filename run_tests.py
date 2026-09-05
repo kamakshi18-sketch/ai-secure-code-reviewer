@@ -141,16 +141,26 @@ def run_security_scan(args):
     ]))
     
     # Semgrep (if available)
-    try:
-        exit_codes.append(run_command(["semgrep", "--config=auto", "."]))
-    except FileNotFoundError:
-        print("⚠️  Semgrep not installed, skipping...")
-    
+    semgrep_code = run_command(["semgrep", "--config=auto", "."])
+    if semgrep_code == 127 or (sys.platform == "win32" and semgrep_code != 0):
+        import shutil
+        if shutil.which("semgrep") is None:
+            print("⚠️  Semgrep not installed, skipping...")
+        else:
+            exit_codes.append(semgrep_code)
+    else:
+        exit_codes.append(semgrep_code)
+
     # Bandit
-    try:
-        exit_codes.append(run_command(["bandit", "-r", "backend/", "-f", "json", "-o", "bandit-results.json"]))
-    except FileNotFoundError:
-        print("⚠️  Bandit not installed, skipping...")
+    bandit_code = run_command(["bandit", "-r", "backend/", "-f", "json", "-o", "bandit-results.json"])
+    if bandit_code == 127 or (sys.platform == "win32" and bandit_code != 0):
+        import shutil
+        if shutil.which("bandit") is None:
+            print("⚠️  Bandit not installed, skipping...")
+        else:
+            exit_codes.append(bandit_code)
+    else:
+        exit_codes.append(bandit_code)
     
     return max(exit_codes) if exit_codes else 0
 

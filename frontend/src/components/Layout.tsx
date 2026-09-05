@@ -18,7 +18,8 @@ import {
   Github,
 } from 'lucide-react';
 import { Avatar, Dropdown } from './ui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { findingsApi } from '../services/api';
 import { cn } from '../utils/cn';
 
 const navigation = [
@@ -39,7 +40,21 @@ export function Layout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  
+  const [severityCounts, setSeverityCounts] = useState({ critical: 0, high: 0, medium: 0, low: 0 });
+
+  useEffect(() => {
+    findingsApi.stats()
+      .then((data: any) => {
+        setSeverityCounts({
+          critical: data.critical ?? 0,
+          high: data.high ?? 0,
+          medium: data.medium ?? 0,
+          low: data.low ?? 0,
+        });
+      })
+      .catch(() => {});
+  }, [location.pathname]);
+
   const handleLogout = async () => {
     await logout();
     setUserMenuOpen(false);
@@ -94,19 +109,19 @@ export function Layout() {
           </p>
           <div className="grid grid-cols-2 gap-2 text-center">
             <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20">
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400">0</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">{severityCounts.critical}</p>
               <p className="text-xs text-red-700 dark:text-red-400">Critical</p>
             </div>
             <div className="p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20">
-              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</p>
+              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{severityCounts.high}</p>
               <p className="text-xs text-orange-700 dark:text-orange-400">High</p>
             </div>
             <div className="p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
-              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">0</p>
+              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{severityCounts.medium}</p>
               <p className="text-xs text-yellow-700 dark:text-yellow-400">Medium</p>
             </div>
             <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">0</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{severityCounts.low}</p>
               <p className="text-xs text-blue-700 dark:text-blue-400">Low</p>
             </div>
           </div>

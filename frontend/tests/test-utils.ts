@@ -63,20 +63,6 @@ export async function waitForToast(page: Page, message: string, timeout = 5000) 
   await page.waitForSelector(`[role="alert"]:has-text("${message}")`, { timeout });
 }
 
-export async function expectNoConsoleErrors(page: Page) {
-  const errors: string[] = [];
-  page.on('console', msg => {
-    if (msg.type() === 'error') {
-      errors.push(msg.text());
-    }
-  });
-  return () => {
-    if (errors.length > 0) {
-      throw new Error(`Console errors: ${errors.join(', ')}`);
-    }
-  };
-}
-
 export function generateTestEmail(): string {
   return `test${Date.now()}@example.com`;
 }

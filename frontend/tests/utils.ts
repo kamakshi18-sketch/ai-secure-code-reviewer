@@ -142,7 +142,6 @@ export function createTestUser(overrides: Partial<{
   full_name: string;
   role: string;
 }> = {}) {
-  const timestamp = Date.now();
   return {
     email: `test${Date.now()}@example.com`,
     password: 'TestPassword123!',

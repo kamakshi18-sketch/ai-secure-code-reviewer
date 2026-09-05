@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { findingsApi } from '../services/api';
 import { Finding } from '../types';
@@ -21,10 +21,13 @@ export function FindingsPage() {
   const [total, setTotal] = useState(0);
   const navigate = useNavigate();
 
-  const fetchFindings = async () => {
+  const fetchFindings = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await findingsApi.list(filters);
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, v]) => v !== '')
+      );
+      const res = await findingsApi.list(cleanFilters);
       setFindings(res.items || []);
       setTotal(res.total || 0);
     } catch (error) {
@@ -32,11 +35,11 @@ export function FindingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters.page, filters.page_size, filters.severity, filters.status, filters.scanner, filters.search]);
 
   useEffect(() => {
     fetchFindings();
-  }, [filters]);
+  }, [fetchFindings]);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value, page: 1 }));

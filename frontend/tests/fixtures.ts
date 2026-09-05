@@ -46,11 +46,11 @@ export const test = base.extend<TestFixtures>({
     
     // Set auth token in localStorage
     await page.goto('/');
-    await page.evaluate((token) => {
+    await page.evaluate(({ token, refreshToken, user }) => {
       localStorage.setItem('ai_reviewer_access_token', token);
-      localStorage.setItem('ai_reviewer_refresh_token', loginData.refresh_token);
-      localStorage.setItem('ai_reviewer_user', JSON.stringify(loginData.user));
-    }, accessToken);
+      localStorage.setItem('ai_reviewer_refresh_token', refreshToken);
+      localStorage.setItem('ai_reviewer_user', JSON.stringify(user));
+    }, { token: accessToken, refreshToken: loginData.refresh_token, user: loginData.user });
     
     await page.reload();
     await page.waitForURL('/dashboard');
