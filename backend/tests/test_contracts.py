@@ -47,7 +47,7 @@ class TestAPIContracts:
         assert user_token.access_token
         assert user_token.refresh_token
         assert user_token.token_type == "bearer"
-        assert user_token.user.email == "schema@test.com"
+        assert user_token.email == "schema@test.com"
 
     @pytest.mark.asyncio
     async def test_token_schema(self, client: AsyncClient, test_user):

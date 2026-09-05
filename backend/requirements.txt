@@ -22,7 +22,7 @@ click>=8.1.7
 click-option-group>=0.5.6
 semgrep>=1.60.0
 bandit==1.7.6
-chromadb>=0.4.24
+chromadb==0.4.22
 sentence-transformers>=2.7.0
 langchain==0.1.8
 langchain-google-genai>=0.0.9
@@ -42,7 +42,3 @@ opentelemetry-instrumentation-fastapi>=0.46b0
 opentelemetry-instrumentation-sqlalchemy>=0.46b0
 opentelemetry-instrumentation-redis>=0.46b0
 opentelemetry-exporter-otlp>=1.25.0
-pytest-asyncio==0.23.3
-Faker==21.0.1
-freezegun==1.5.1
-isort==5.13.2

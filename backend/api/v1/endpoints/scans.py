@@ -6,7 +6,7 @@ from sqlalchemy import select, func
 
 from core.security import get_current_active_user, require_role
 from database.session import get_db
-from models import User, Repository, Scan, ScanStatus, ScanType, UserRole
+from models import User, Repository, RepositoryStatus, Scan, ScanStatus, ScanType, UserRole
 from schemas import (
     ScanCreate,
     ScanResponse,
@@ -76,7 +76,7 @@ async def create_scan(
             detail="Repository not found"
         )
     
-    if repository.status != "cloned":
+    if repository.status != RepositoryStatus.CLONED:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Repository must be cloned before scanning"

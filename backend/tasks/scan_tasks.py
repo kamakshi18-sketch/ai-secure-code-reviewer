@@ -9,7 +9,7 @@ from datetime import datetime
 from core.celery_app import celery_app
 from core.logging import get_logger, log_task_event, log_scan_event
 from database.session import async_session_maker
-from models import Scan, ScanStatus, Finding, Severity, Repository, FindingStatus
+from models import Scan, ScanStatus, Finding, Severity, Repository, FindingStatus, Patch, PatchStatus
 from security.scanners import scanner_registry
 from security.aggregator import finding_aggregator, finding_deduplicator, finding_correlator
 from core.config import settings
@@ -177,7 +177,7 @@ def generate_patches_for_scan_task(scan_id: str):
             result = await db.execute(
                 select(Finding).where(
                     Finding.scan_id == scan_id,
-                    Finding.status == "open"
+                    Finding.status == FindingStatus.OPEN
                 )
             )
             findings = result.scalars().all()
@@ -188,11 +188,10 @@ def generate_patches_for_scan_task(scan_id: str):
                 existing = await db.execute(
                     select(Patch).where(
                         Patch.finding_id == finding.id,
-                        Patch.status.in_(["pending", "generating", "generated"])
+                        Patch.status.in_([PatchStatus.PENDING, PatchStatus.GENERATING, PatchStatus.GENERATED])
                     )
                 )
                 if not existing.scalar_one_or_none():
-                    from models import Patch, PatchStatus
                     patch = Patch(
                         scan_id=scan_id,
                         finding_id=finding.id,

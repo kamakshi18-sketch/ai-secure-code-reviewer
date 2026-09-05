@@ -41,7 +41,11 @@ Never hallucinate security advice - always ground responses in retrieved knowled
         action = input_data.get("action", "chat")
         
         if action == "chat":
-            return await self.process_chat(input_data)
+            return await self.process_chat(
+                messages=input_data.get("messages", []),
+                context=input_data.get("context", {}),
+                user_id=input_data.get("user_id", ""),
+            )
         elif action == "full_analysis":
             return await self.run_full_analysis(input_data)
         elif action == "explain_finding":
@@ -51,7 +55,11 @@ Never hallucinate security advice - always ground responses in retrieved knowled
         elif action == "verify_patch":
             return await self.verify_patch(input_data)
         else:
-            return await self.process_chat(input_data)
+            return await self.process_chat(
+                messages=input_data.get("messages", []),
+                context=input_data.get("context", {}),
+                user_id=input_data.get("user_id", ""),
+            )
     
     async def process_chat(
         self,

@@ -163,8 +163,8 @@ class FindingCorrelator:
             ("command", "injection"): ["cwe-78", "a03"],
             ("path", "traversal"): ["cwe-22", "a01"],
             ("secret", "credential"): ["cwe-798", "a02"],
-            ("deserialization"): ["cwe-502", "a08"],
-            ("ssrf"): ["cwe-918", "a10"],
+            ("deserialization",): ["cwe-502", "a08"],
+            ("ssrf",): ["cwe-918", "a10"],
         }
     
     def correlate(self, findings: List[Finding]) -> Dict[str, List[Finding]]:

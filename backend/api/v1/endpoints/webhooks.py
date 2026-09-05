@@ -8,7 +8,7 @@ from sqlalchemy import select
 from core.config import settings
 from core.security import get_current_active_user
 from database.session import get_db
-from models import User, Repository, Scan, ScanType, ScanStatus, UserRole
+from models import User, Repository, RepositoryStatus, Scan, ScanType, ScanStatus, UserRole
 from schemas import WebhookEvent
 from tasks.scan_tasks import run_security_scan_task
 from github.oauth import github_app_service
@@ -151,7 +151,7 @@ async def handle_repository_event(event_data: dict, db: AsyncSession):
             )
             repository = result.scalar_one_or_none()
             if repository:
-                repository.status = "deleted"
+                repository.status = RepositoryStatus.FAILED
                 await db.commit()
 
 

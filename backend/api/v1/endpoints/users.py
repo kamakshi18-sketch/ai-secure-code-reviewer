@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 
-from core.security import get_current_active_user, get_current_superuser, require_role
+from core.security import get_current_active_user, get_current_superuser, require_role, get_password_hash
 from database.session import get_db
 from models import User, UserRole
 from schemas import UserResponse, UserCreate, UserUpdate, PaginatedResponse
@@ -82,8 +82,6 @@ async def create_user(
     current_user: User = Depends(get_current_superuser),
     db: AsyncSession = Depends(get_db)
 ):
-    from api.v1.endpoints.auth import get_password_hash
-    
     result = await db.execute(select(User).where(User.email == user_data.email))
     if result.scalar_one_or_none():
         raise HTTPException(
@@ -122,7 +120,6 @@ async def update_user(
     
     update_data = user_update.model_dump(exclude_unset=True)
     if "password" in update_data:
-        from api.v1.endpoints.auth import get_password_hash
         user.hashed_password = get_password_hash(update_data.pop("password"))
     
     for field, value in update_data.items():

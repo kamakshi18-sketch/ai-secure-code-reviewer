@@ -11,7 +11,7 @@ from github import Github
 from core.celery_app import celery_app
 from core.logging import get_logger, log_task_event
 from database.session import async_session_maker
-from models import PullRequest, PullRequestStatus, Patch, Repository, Scan
+from models import PullRequest, PullRequestStatus, Patch, PatchStatus, Finding, Repository, Scan
 from core.config import settings
 
 logger = get_logger("github_tasks")
@@ -58,7 +58,7 @@ def create_pull_request_task(self, pr_id: str):
                 patches = []
                 for patch_id in pr.patches_included:
                     patch = await db.get(Patch, patch_id)
-                    if patch and patch.status == "applied":
+                    if patch and patch.status == PatchStatus.APPLIED:
                         patches.append(patch)
                 
                 if not patches:
@@ -69,7 +69,7 @@ def create_pull_request_task(self, pr_id: str):
                 
                 commit_message = f"Security fixes: {len(patches)} vulnerabilities patched\n\n"
                 for patch in patches:
-                    finding = await db.get(Patch, patch.finding_id)
+                    finding = await db.get(Finding, patch.finding_id)
                     if finding:
                         commit_message += f"- Fix {finding.rule_id}: {finding.rule_name} in {finding.file_path}\n"
                 

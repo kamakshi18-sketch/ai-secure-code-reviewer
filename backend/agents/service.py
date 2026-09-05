@@ -7,7 +7,7 @@ import asyncio
 
 from core.logging import get_logger
 from database.session import get_db
-from models import Scan, Finding, Patch, Repository, PullRequest, ScanStatus
+from models import Scan, Finding, FindingStatus, Patch, Repository, PullRequest, ScanStatus
 from rag.engine import RAGEngine, rag_engine
 from agents.base import AgentOrchestrator
 from agents.coordinator import CoordinatorAgent, WorkflowOrchestrator, workflow_orchestrator
@@ -52,7 +52,7 @@ class AgentService:
         result = await db.execute(
             select(Finding).where(
                 Finding.scan_id == scan_id,
-                Finding.status == "open"
+                Finding.status == FindingStatus.OPEN
             )
         )
         findings = result.scalars().all()
@@ -202,8 +202,9 @@ class AgentService:
             "file_path": finding.file_path,
         }
         
-        test_results = input_data.get("test_results", {})
-        scan_results = input_data.get("scan_results", {})
+        verification = patch.verification_result or {}
+        test_results = verification.get("test_details", {})
+        scan_results = verification.get("scan_details", {})
         
         return await self.verification_agent.analyze_failure({
             "patch": patch_dict,

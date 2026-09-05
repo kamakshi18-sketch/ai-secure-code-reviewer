@@ -78,11 +78,12 @@ class VerificationService:
     async def verify_patch(
         self,
         repo: Repository,
-        original_findings_count: int
+        original_findings_count: int,
+        scan: Scan = None
     ) -> Dict[str, Any]:
         test_results = await self.run_tests(repo)
-        
-        scan_passed = await run_security_re_scan(repo, repo.scans[-1] if repo.scans else None)
+
+        scan_passed = await run_security_re_scan(repo, scan)
         
         return {
             "test_passed": test_results["passed"],

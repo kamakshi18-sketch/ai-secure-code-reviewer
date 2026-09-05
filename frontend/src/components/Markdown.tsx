@@ -9,23 +9,27 @@ interface MarkdownProps {
 }
 
 const components = {
-  code: ({ node, children, ...props }: any) => {
-    const className = node.properties?.className?.[0] || '';
-    const language = className.replace('language-', '');
-    
+  code: ({ node, children, className: codeClassName, ...props }: any) => {
+    const isBlock = node?.position?.start?.line !== node?.position?.end?.line
+      || /language-/.test(codeClassName || '');
+    const language = (codeClassName || '').replace('language-', '');
+
+    if (isBlock) {
+      return (
+        <pre className={cn('rounded-lg bg-dark-100 dark:bg-dark-900 p-4 overflow-x-auto', props.className)}>
+          <code className={cn('text-sm font-mono', language && `language-${language}`)}>
+            {String(children).replace(/\n$/, '')}
+          </code>
+        </pre>
+      );
+    }
+
     return (
-      <pre className={cn('rounded-lg bg-dark-100 dark:bg-dark-900 p-4 overflow-x-auto', props.className)}>
-        <code className={cn('text-sm font-mono', language && `language-${language}`)}>
-          {String(children).replace(/\n$/, '')}
-        </code>
-      </pre>
+      <code className={cn('rounded bg-dark-100 dark:bg-dark-800 px-1.5 py-0.5 text-sm font-mono', props.className)}>
+        {children}
+      </code>
     );
   },
-  inlineCode: ({ children, ...props }: any) => (
-    <code className={cn('rounded bg-dark-100 dark:bg-dark-800 px-1.5 py-0.5 text-sm font-mono', props.className)}>
-      {children}
-    </code>
-  ),
   blockquote: ({ children, ...props }: any) => (
     <blockquote className={cn('border-l-4 border-primary-500 pl-4 italic text-dark-600 dark:text-dark-400', props.className)}>
       {children}

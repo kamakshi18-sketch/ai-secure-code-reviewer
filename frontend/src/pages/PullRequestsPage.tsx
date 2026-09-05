@@ -79,12 +79,10 @@ export function PullRequestsPage() {
                   </div>
                   
                   <div className="flex items-center gap-2 shrink-0">
-                    {pr.github_pr_id && (
-                      <Button size="sm" variant="outline" asChild>
-                        <a href={`https://github.com/pull/${pr.github_pr_id}`} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-3 w-3 mr-1" /> View on GitHub
-                        </a>
-                      </Button>
+                    {pr.github_pr_number && (
+                      <Badge variant="default" className="text-sm">
+                        <ExternalLink className="h-3 w-3 mr-1 inline" /> PR #{pr.github_pr_number}
+                      </Badge>
                     )}
                     <Dropdown
                       trigger={

@@ -387,7 +387,7 @@ class TestReportEndpoints:
         assert "report_id" in data
 
     @pytest.mark.asyncio
-    async def test_get_report(self, client: AsyncClient, auth_headers):
+    async def test_get_report(self, client: AsyncClient, auth_headers, test_scan):
         # First create a report
         create_response = await client.post(
             "/api/v1/reports",
@@ -402,7 +402,7 @@ class TestReportEndpoints:
         assert data["id"] == report_id
 
     @pytest.mark.asyncio
-    async def test_download_report(self, client: AsyncClient, auth_headers):
+    async def test_download_report(self, client: AsyncClient, auth_headers, test_scan):
         # First create a report
         create_response = await client.post(
             "/api/v1/reports",

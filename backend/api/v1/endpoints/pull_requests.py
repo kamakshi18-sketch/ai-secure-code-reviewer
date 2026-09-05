@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from core.security import get_current_active_user, require_role
 from database.session import get_db
-from models import User, PullRequest, PullRequestStatus, Patch, Scan, Repository, UserRole
+from models import User, PullRequest, PullRequestStatus, Patch, PatchStatus, Scan, Repository, UserRole
 from schemas import (
     PullRequestResponse,
     PullRequestCreate,
@@ -87,7 +87,7 @@ async def create_pull_request(
     if pr_data.patch_ids:
         patch_query = select(Patch).where(
             Patch.id.in_(pr_data.patch_ids),
-            Patch.status == "generated"
+            Patch.status == PatchStatus.GENERATED
         )
         patch_result = await db.execute(patch_query)
         patches = patch_result.scalars().all()

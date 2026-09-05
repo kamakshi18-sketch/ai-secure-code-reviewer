@@ -8,9 +8,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', asChild: _asChild, disabled, children, ...props }, ref) => {
+  ({ className, variant = 'primary', size = 'md', asChild = false, disabled, children, ...props }, ref) => {
     const baseStyles = 'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
-    
+
     const variants: Record<string, string> = {
       primary: 'bg-primary-600 text-white hover:bg-primary-700',
       secondary: 'bg-dark-100 text-dark-900 hover:bg-dark-200 dark:bg-dark-800 dark:text-dark-50 dark:hover:bg-dark-700',
@@ -18,18 +18,32 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ghost: 'bg-transparent hover:bg-dark-100 dark:hover:bg-dark-800',
       destructive: 'bg-red-600 text-white hover:bg-red-700',
     };
-    
+
     const sizes: Record<string, string> = {
       sm: 'px-3 py-1.5 text-xs',
       md: 'px-4 py-2 text-sm',
       lg: 'px-6 py-3 text-base',
       icon: 'p-2',
     };
-    
+
+    const classes = cn(baseStyles, variants[variant] || variants.primary, sizes[size] || sizes.md, className);
+
+    if (asChild && children && typeof children === 'object' && 'type' in (children as any)) {
+      const child = children as React.ReactElement<any>;
+      const { className: childClassName, ...childProps } = child.props || {};
+      return (
+        <>
+          {Object.assign({}, child, {
+            props: { ...childProps, className: cn(classes, childClassName), ref },
+          })}
+        </>
+      );
+    }
+
     return (
       <button
         ref={ref}
-        className={cn(baseStyles, variants[variant] || variants.primary, sizes[size] || sizes.md, className)}
+        className={classes}
         disabled={disabled}
         {...props}
       >
@@ -323,11 +337,12 @@ export const Dropdown = ({
           {items.map((item, index) => (
             <button
               key={index}
-              onClick={() => { item.onClick(); setOpen(false); }}
+              disabled={item.disabled}
+              onClick={() => { if (!item.disabled) { item.onClick(); setOpen(false); } }}
               className={cn(
                 'w-full px-4 py-2 text-left text-sm flex items-center gap-2',
                 item.danger ? 'text-red-600 dark:text-red-400' : 'text-dark-700 dark:text-dark-300',
-                'hover:bg-dark-100 dark:hover:bg-dark-700'
+                item.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-dark-100 dark:hover:bg-dark-700'
               )}
             >
               {item.icon && <span>{item.icon}</span>}

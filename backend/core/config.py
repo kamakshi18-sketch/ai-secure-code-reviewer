@@ -91,6 +91,7 @@ class Settings(BaseSettings):
     SENTRY_DSN: Optional[str] = Field(default=None, description="Sentry DSN for error tracking")
     OTEL_EXPORTER_OTLP_ENDPOINT: Optional[str] = Field(default=None, description="OTLP endpoint for tracing")
 
+    BACKEND_URL: str = Field(default="http://localhost:8001", description="Public URL of this backend")
     GITHUB_API_URL: str = Field(default="https://api.github.com", description="GitHub API base URL")
     GITHUB_RAW_URL: str = Field(default="https://raw.githubusercontent.com", description="GitHub raw content URL")
 

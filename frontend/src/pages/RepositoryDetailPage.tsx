@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { RepositoryDetail } from '../components/RepositoryDetail';
@@ -9,8 +9,11 @@ export function RepositoryDetailPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
+  useEffect(() => {
+    if (!id) navigate('/repositories');
+  }, [id, navigate]);
+
   if (!id) {
-    navigate('/repositories');
     return null;
   }
 

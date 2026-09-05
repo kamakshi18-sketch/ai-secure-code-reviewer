@@ -9,13 +9,17 @@ class Base(DeclarativeBase):
     pass
 
 
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.ENVIRONMENT == "development",
-    poolclass=NullPool if settings.ENVIRONMENT == "development" else None,
-    pool_pre_ping=True,
-    pool_recycle=3600,
-)
+_engine_kwargs = {
+    "echo": settings.ENVIRONMENT == "development",
+}
+
+if settings.ENVIRONMENT == "development":
+    _engine_kwargs["poolclass"] = NullPool
+else:
+    _engine_kwargs["pool_pre_ping"] = True
+    _engine_kwargs["pool_recycle"] = 3600
+
+engine = create_async_engine(settings.DATABASE_URL, **_engine_kwargs)
 
 async_session_maker = async_sessionmaker(
     engine,

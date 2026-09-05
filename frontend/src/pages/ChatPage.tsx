@@ -22,11 +22,10 @@ export function ChatPage() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || loading) return;
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || loading) return;
 
-    const userMessage: ChatMessage = { role: 'user', content: input };
+    const userMessage: ChatMessage = { role: 'user', content: text };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setLoading(true);
@@ -36,18 +35,23 @@ export function ChatPage() {
         messages: [...messages, userMessage],
         ...context,
       });
-      
+
       setMessages(prev => [...prev, response.message]);
     } catch (error) {
       console.error('Chat error:', error);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Sorry, I encountered an error. Please try again.' 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.'
       }]);
     } finally {
       setLoading(false);
       textareaRef.current?.focus();
     }
+  };
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage(input);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -87,7 +91,7 @@ export function ChatPage() {
           </div>
         </CardHeader>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6" ref={messagesEndRef}>
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {messages.length === 0 ? (
             <div className="text-center text-dark-500 py-12">
               <Bot className="h-16 w-16 mx-auto mb-4 opacity-50" />
@@ -104,7 +108,7 @@ export function ChatPage() {
                 ].map((suggestion, i) => (
                   <button
                     key={i}
-                    onClick={() => { setInput(suggestion); handleSend({ preventDefault: () => {} } as any); }}
+                    onClick={() => sendMessage(suggestion)}
                     className="text-left p-3 rounded-lg bg-dark-100 dark:bg-dark-800 hover:bg-dark-200 dark:hover:bg-dark-700 transition-colors text-sm"
                   >
                     {suggestion}
@@ -146,6 +150,7 @@ export function ChatPage() {
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
         <CardContent className="p-4 border-t border-dark-200 dark:border-dark-700">

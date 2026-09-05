@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from core.security import get_current_active_user, require_role
 from database.session import get_db
-from models import User, Finding, Patch, Scan, Repository, UserRole
+from models import User, Finding, Patch, PatchStatus, Scan, ScanStatus, Repository, UserRole
 from schemas import (
     FindingResponse,
     PatchResponse,
@@ -48,13 +48,12 @@ async def generate_patch_for_finding(
     existing = await db.execute(
         select(Patch).where(
             Patch.finding_id == finding_id,
-            Patch.status.in_(["pending", "generating", "generated"])
+            Patch.status.in_([PatchStatus.PENDING, PatchStatus.GENERATING, PatchStatus.GENERATED])
         )
     )
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Patch generation already in progress")
     
-    from models import Patch, PatchStatus
     patch = Patch(
         scan_id=finding.scan_id,
         finding_id=finding_id,
@@ -113,7 +112,7 @@ async def generate_report(
     if current_user.role not in [UserRole.ADMIN, UserRole.SECURITY_ENGINEER] and repo.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized")
     
-    if scan.status != "completed":
+    if scan.status != ScanStatus.COMPLETED:
         raise HTTPException(status_code=400, detail="Scan must be completed")
     
     result = await agent_service.generate_report(scan_id, db, format)

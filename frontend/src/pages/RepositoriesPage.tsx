@@ -156,7 +156,7 @@ export function RepositoriesPage() {
                     items={[
                       { label: 'View Details', onClick: () => navigate(`/repositories/${repo.id}`), icon: <Search className="h-4 w-4" /> },
                       { label: 'Start Scan', onClick: () => navigate(`/repositories/${repo.id}?tab=scans`), icon: <Play className="h-4 w-4" /> },
-                      { label: 'Clone', onClick: () => handleClone(repo.id), icon: <Code className="h-4 w-4" />, disabled: repo.status !== 'cloned' },
+                      { label: 'Clone', onClick: () => handleClone(repo.id), icon: <Code className="h-4 w-4" />, disabled: repo.status === 'cloned' || repo.status === 'cloning' },
                       { label: 'Detect Language', onClick: () => handleDetectLanguage(repo.id), icon: <Edit className="h-4 w-4" />, disabled: repo.status !== 'cloned' },
                       { label: 'Delete', onClick: () => handleDelete(repo.id), icon: <Trash2 className="h-4 w-4" />, danger: true },
                     ]}

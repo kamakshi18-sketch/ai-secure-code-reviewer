@@ -16,7 +16,7 @@ class GitHubOAuthService:
     def __init__(self):
         self.client_id = settings.GITHUB_CLIENT_ID
         self.client_secret = settings.GITHUB_CLIENT_SECRET
-        self.redirect_uri = f"{settings.GITHUB_API_URL}/api/v1/auth/github/callback"
+        self.redirect_uri = f"{settings.BACKEND_URL}/api/v1/auth/github/callback"
     
     def get_authorization_url(self, state: str = None) -> str:
         params = {

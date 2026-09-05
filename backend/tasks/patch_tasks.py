@@ -11,7 +11,7 @@ from pathlib import Path
 from core.celery_app import celery_app
 from core.logging import get_logger, log_task_event, log_patch_event
 from database.session import async_session_maker
-from models import Patch, PatchStatus, Finding, Scan, Repository, PatchAttempt
+from models import Patch, PatchStatus, Finding, FindingStatus, Scan, Repository, PatchAttempt
 from core.config import settings
 from agents.service import agent_service
 
@@ -199,7 +199,7 @@ def generate_patches_for_scan_task(scan_id: str):
             result = await db.execute(
                 select(Finding).where(
                     Finding.scan_id == scan_id,
-                    Finding.status == "open"
+                    Finding.status == FindingStatus.OPEN
                 )
             )
             findings = result.scalars().all()
@@ -208,7 +208,7 @@ def generate_patches_for_scan_task(scan_id: str):
                 existing = await db.execute(
                     select(Patch).where(
                         Patch.finding_id == finding.id,
-                        Patch.status.in_(["pending", "generating", "generated"])
+                        Patch.status.in_([PatchStatus.PENDING, PatchStatus.GENERATING, PatchStatus.GENERATED])
                     )
                 )
                 if not existing.scalar_one_or_none():

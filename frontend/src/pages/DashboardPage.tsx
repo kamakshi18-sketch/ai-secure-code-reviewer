@@ -212,14 +212,14 @@ export function DashboardPage() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {[
-              { key: 'critical', label: 'Critical', color: 'red' },
-              { key: 'high', label: 'High', color: 'orange' },
-              { key: 'medium', label: 'Medium', color: 'yellow' },
-              { key: 'low', label: 'Low', color: 'blue' },
-              { key: 'info', label: 'Info', color: 'gray' },
-            ].map(({ key, label, color }) => (
+              { key: 'critical', label: 'Critical', colorClass: 'text-red-600 dark:text-red-400' },
+              { key: 'high', label: 'High', colorClass: 'text-orange-600 dark:text-orange-400' },
+              { key: 'medium', label: 'Medium', colorClass: 'text-yellow-600 dark:text-yellow-400' },
+              { key: 'low', label: 'Low', colorClass: 'text-blue-600 dark:text-blue-400' },
+              { key: 'info', label: 'Info', colorClass: 'text-gray-600 dark:text-gray-400' },
+            ].map(({ key, label, colorClass }) => (
               <div key={key} className="text-center p-4 rounded-lg bg-dark-50 dark:bg-dark-800">
-                <p className="text-3xl font-bold" style={{ color: `var(--${color}-600)` }}>
+                <p className={cn('text-3xl font-bold', colorClass)}>
                   {findingsStats.by_severity?.[key] || 0}
                 </p>
                 <p className="text-sm text-dark-500 mt-1">{label}</p>

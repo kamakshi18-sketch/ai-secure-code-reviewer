@@ -80,6 +80,18 @@ async def list_findings(
     )
 
 
+@router.get("/stats/summary")
+async def get_findings_summary(
+    repository_id: Optional[UUID] = Query(None),
+    scan_id: Optional[UUID] = Query(None),
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    stats = await finding_service.get_finding_stats(db, repository_id, scan_id)
+
+    return stats
+
+
 @router.get("/{finding_id}", response_model=FindingResponse)
 async def get_finding(
     finding_id: UUID,
@@ -87,19 +99,19 @@ async def get_finding(
     db: AsyncSession = Depends(get_db)
 ):
     query = select(Finding).join(Scan).join(Repository).where(Finding.id == finding_id)
-    
+
     if current_user.role not in [UserRole.ADMIN, UserRole.SECURITY_ENGINEER]:
         query = query.where(Repository.owner_id == current_user.id)
-    
+
     result = await db.execute(query)
     finding = result.scalar_one_or_none()
-    
+
     if not finding:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Finding not found"
         )
-    
+
     return FindingResponse.model_validate(finding)
 
 
@@ -111,21 +123,21 @@ async def update_finding(
     db: AsyncSession = Depends(get_db)
 ):
     query = select(Finding).join(Scan).join(Repository).where(Finding.id == finding_id)
-    
+
     if current_user.role not in [UserRole.ADMIN, UserRole.SECURITY_ENGINEER]:
         query = query.where(Repository.owner_id == current_user.id)
-    
+
     result = await db.execute(query)
     finding = result.scalar_one_or_none()
-    
+
     if not finding:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Finding not found"
         )
-    
+
     finding = await finding_service.update_finding_status(db, finding_id, finding_update.status)
-    
+
     return FindingResponse.model_validate(finding)
 
 
@@ -137,7 +149,7 @@ async def bulk_update_findings(
     db: AsyncSession = Depends(get_db)
 ):
     updated = await finding_service.bulk_update_status(db, finding_ids, status)
-    
+
     return {"updated": updated}
 
 
@@ -148,33 +160,21 @@ async def explain_finding(
     db: AsyncSession = Depends(get_db)
 ):
     from tasks.patch_tasks import explain_finding_task
-    
+
     query = select(Finding).join(Scan).join(Repository).where(Finding.id == finding_id)
-    
+
     if current_user.role not in [UserRole.ADMIN, UserRole.SECURITY_ENGINEER]:
         query = query.where(Repository.owner_id == current_user.id)
-    
+
     result = await db.execute(query)
     finding = result.scalar_one_or_none()
-    
+
     if not finding:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Finding not found"
         )
-    
+
     explain_finding_task.delay(str(finding_id))
-    
+
     return {"message": "AI explanation task started", "finding_id": str(finding_id)}
-
-
-@router.get("/stats/summary")
-async def get_findings_summary(
-    repository_id: Optional[UUID] = Query(None),
-    scan_id: Optional[UUID] = Query(None),
-    current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db)
-):
-    stats = await finding_service.get_finding_stats(db, repository_id, scan_id)
-    
-    return stats

@@ -185,40 +185,51 @@ class FindingService:
         repository_id: Optional[UUID] = None,
         scan_id: Optional[UUID] = None
     ) -> Dict[str, Any]:
-        query = select(Finding)
-        
+        filters = []
+        needs_join = False
         if repository_id:
-            query = query.join(Scan).where(Scan.repository_id == repository_id)
+            filters.append(Scan.repository_id == repository_id)
+            needs_join = True
         if scan_id:
-            query = query.where(Finding.scan_id == scan_id)
-        
-        total = await db.scalar(select(func.count()).select_from(query.subquery()))
-        
+            filters.append(Finding.scan_id == scan_id)
+
+        def _base(cols):
+            q = select(*cols)
+            if needs_join:
+                q = q.join(Scan, Finding.scan_id == Scan.id)
+            for f in filters:
+                q = q.where(f)
+            return q
+
+        total = await db.scalar(
+            _base([func.count(Finding.id)])
+        )
+
         severity_counts = await db.execute(
-            query.with_only_columns(Finding.severity, func.count(Finding.id))
+            _base([Finding.severity, func.count(Finding.id)])
             .group_by(Finding.severity)
         )
-        
+
         status_counts = await db.execute(
-            query.with_only_columns(Finding.status, func.count(Finding.id))
+            _base([Finding.status, func.count(Finding.id)])
             .group_by(Finding.status)
         )
-        
+
         scanner_counts = await db.execute(
-            query.with_only_columns(Finding.scanner, func.count(Finding.id))
+            _base([Finding.scanner, func.count(Finding.id)])
             .group_by(Finding.scanner)
         )
-        
+
         cwe_counts = await db.execute(
-            query.with_only_columns(Finding.cwe_id, func.count(Finding.id))
+            _base([Finding.cwe_id, func.count(Finding.id)])
             .where(Finding.cwe_id.isnot(None))
             .group_by(Finding.cwe_id)
             .order_by(func.count(Finding.id).desc())
             .limit(10)
         )
-        
+
         return {
-            "total": total,
+            "total": total or 0,
             "by_severity": {s.value: c for s, c in severity_counts.all()},
             "by_status": {s.value: c for s, c in status_counts.all()},
             "by_scanner": dict(scanner_counts.all()),

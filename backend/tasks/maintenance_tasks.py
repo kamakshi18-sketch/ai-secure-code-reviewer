@@ -1,6 +1,6 @@
 from celery import shared_task
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, text
 import structlog
 import asyncio
 import os
@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from core.celery_app import celery_app
 from core.logging import get_logger, log_task_event
 from database.session import async_session_maker
-from models import Scan, ScanStatus, Finding, Patch, TestResult, AuditLog, Embedding
+from models import Scan, ScanStatus, Finding, Patch, PatchStatus, TestResult, AuditLog, Embedding
 from core.config import settings
 
 logger = get_logger("maintenance_tasks")
@@ -105,7 +105,7 @@ def cleanup_failed_patches():
             
             result = await db.execute(
                 delete(Patch).where(
-                    Patch.status.in_(["failed", "rejected"]),
+                    Patch.status.in_([PatchStatus.FAILED, PatchStatus.REJECTED]),
                     Patch.created_at < cutoff
                 )
             )
@@ -144,7 +144,7 @@ def vacuum_database():
     
     async def _vacuum():
         async with async_session_maker() as db:
-            await db.execute("VACUUM ANALYZE")
+            await db.execute(text("VACUUM ANALYZE"))
             logger.info("Database vacuumed")
             log_task_event("vacuum_database", "completed")
     

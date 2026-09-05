@@ -29,25 +29,28 @@ jobs:
           POSTGRES_USER: ai_reviewer
           POSTGRES_PASSWORD: test_password
           POSTGRES_DB: ai_code_reviewer_test
-        ports: 5432:5432
+        ports:
+          - "5432:5432"
         options: >-
           --health-cmd "pg_isready -U ai_reviewer -d ai_code_reviewer_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       redis:
         image: redis:7-alpine
-        ports: 6379:6379
+        ports:
+          - "6379:6379"
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       chromadb:
         image: chromadb/chroma:0.4.22
-        ports: 8000:8000
+        ports:
+          - "8000:8000"
         options: >-
           --health-cmd "curl -f http://localhost:8000/api/v1/heartbeat"
           --health-interval 10s
@@ -101,7 +104,7 @@ jobs:
     name: Frontend Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -142,7 +145,7 @@ jobs:
     name: Playwright E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    
+
     services:
       postgres:
         image: postgres:16-alpine
@@ -150,25 +153,28 @@ jobs:
           POSTGRES_USER: ai_reviewer
           POSTGRES_PASSWORD: test_password
           POSTGRES_DB: ai_code_reviewer_test
-        ports: 5432:5432
+        ports:
+          - "5432:5432"
         options: >-
           --health-cmd "pg_isready -U ai_reviewer -d ai_code_reviewer_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       redis:
         image: redis:7-alpine
-        ports: 6379:6379
+        ports:
+          - "6379:6379"
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       chromadb:
         image: chromadb/chroma:0.4.22
-        ports: 8000:8000
+        ports:
+          - "8000:8000"
         options: >-
           --health-cmd "curl -f http://localhost:8000/api/v1/heartbeat"
           --health-interval 10s

@@ -8,7 +8,7 @@ from sqlalchemy import select, func
 
 from core.security import get_current_active_user, require_role
 from database.session import get_db
-from models import User, SecurityReport, ReportFormat, Scan, Repository, UserRole
+from models import User, SecurityReport, ReportFormat, Scan, ScanStatus, Repository, UserRole
 from schemas import (
     SecurityReportResponse,
     SecurityReportCreate,
@@ -32,7 +32,6 @@ async def list_reports(
     
     items = []
     for report in result["items"]:
-        repo = await db.get(Repository, report.scan_id)
         items.append(SecurityReportResponse.model_validate(report))
     
     return PaginatedResponse(
@@ -64,7 +63,7 @@ async def create_report(
             detail="Scan not found"
         )
     
-    if scan.status != "completed":
+    if scan.status != ScanStatus.COMPLETED:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Scan must be completed before generating report"
@@ -77,7 +76,8 @@ async def create_report(
         title=report_data.title
     )
     
-    return {"report_id": result["report_id"], "status": result["status"]}
+    report = await report_service.get_report(db, result["report_id"])
+    return SecurityReportResponse.model_validate(report)
 
 
 @router.get("/{report_id}", response_model=SecurityReportResponse)

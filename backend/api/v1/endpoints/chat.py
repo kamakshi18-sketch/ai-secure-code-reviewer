@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from core.security import get_current_active_user
 from database.session import get_db
-from models import User, Finding, Scan, Repository
+from models import User, UserRole, Finding, Scan, Repository
 from schemas import ChatRequest, ChatResponse, ChatMessage
 
 router = APIRouter()
@@ -25,7 +25,7 @@ async def chat(
     
     if request.repository_id:
         repo = await db.get(Repository, request.repository_id)
-        if repo and (current_user.role in ["admin", "security_engineer"] or repo.owner_id == current_user.id):
+        if repo and (current_user.role in [UserRole.ADMIN, UserRole.SECURITY_ENGINEER] or repo.owner_id == current_user.id):
             context["repository"] = {
                 "id": str(repo.id),
                 "name": repo.name,
@@ -94,7 +94,7 @@ async def explain_finding_chat(
     scan = await db.get(Scan, finding.scan_id)
     repo = await db.get(Repository, scan.repository_id) if scan else None
     
-    if repo and current_user.role not in ["admin", "security_engineer"] and repo.owner_id != current_user.id:
+    if repo and current_user.role not in [UserRole.ADMIN, UserRole.SECURITY_ENGINEER] and repo.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this finding"
