@@ -29,5 +29,5 @@ httpie==3.2.2
 
 # Documentation
 mkdocs==1.5.3
-mkdocs-material==9.4.8
+mkdocs-material==9.7.7
 mkdocstrings[python]==0.24.0
