@@ -23,7 +23,7 @@ types-python-jose==3.3.0
 types-passlib==1.7.4
 
 # Development tools
-ipython==8.18.1
+ipython==9.17.1
 ipdb==0.13.13
 httpie==3.2.2
 
